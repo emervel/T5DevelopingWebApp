@@ -1,6 +1,0 @@
-----------------------------
-static-content
-----------------------------
-
-1. Describe como poner los contenidos estaticos para que puedan ser accedidos por Spring
-2. Muestra como usar librerieas directamente descargandolas o metiendo el webjars como dependencia en el pom para usarlas
