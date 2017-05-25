@@ -1,8 +1,10 @@
 package com.toysforshots.controller;
 
+import com.toysforshots.domain.CustomGenericException;
 import com.toysforshots.domain.Post;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -10,28 +12,48 @@ import java.util.ArrayList;
 import java.util.Date;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.servlet.ModelAndView;
 
-import javax.servlet.http.HttpServletRequest;
 
-
+/**
+ * Controller para hacer los mappings
+ */
 @Controller
-@RequestMapping("/posts")
+@RequestMapping("/posts") //Con esto consigo que todos los mapping debajo tengan este path incluido
 public class PostController {
 
+    /**
+     * log para escribir
+     */
     private static final Logger logger = LoggerFactory.getLogger(PostController.class);
 
+    /**
+     * redirecciona posts/inicio a la vista index
+     * @return
+     */
+    @RequestMapping("/inicio")
+    public String home() {
+        return "index";
+    }
+
+    /**
+     * Lanza una excepcion CustomGenericException para que la trate ExceptionHandler
+     * @param slug representa un valor del path que podemos utilizar dentro del metodo
+     * @return
+     * @throws Exception
+     */
     @RequestMapping("/get/{slug}")
     public String getPost(@PathVariable(value="slug") String slug) throws Exception{
         Post post = null;
-        if( post == null ) throw new Exception("We couldn't find the post with slug: " + slug);
+        if( post == null ) throw new CustomGenericException("E888", "No se encuentra el post "+slug);
         return "post";
     }
-/*
-	@ExceptionHandler(Exception.class)
-	public String handleException(HttpServletRequest req, Exception exception, Model model){
-		model.addAttribute("errorMessage", exception.getMessage() );
-		return "postError";
-	}*/
+
+    /**
+     *
+     * @param model Son como cajetillas donde pasaremos los atributos que queremos que se usen desde th
+     * @return string al nombre de la vista donde nos redirigiremos
+     */
     @RequestMapping("/")
     public String list(Model model){
         model.addAttribute("pageTitle","My Custom Page Title");
@@ -39,8 +61,28 @@ public class PostController {
         return "views/list";
     }
 
+    /**
+     * Anotado como manejador de las excepciones de tipo CustomGenericException que es un POJO
+     * @param ex excepcion que recibiremos
+     * @return Devolvemos un objeto que es el Model con los atributos que pasamos y la vista a donde se los mandamos
+     */
+    @ExceptionHandler(CustomGenericException.class)
+    public ModelAndView handleCustomException(CustomGenericException ex) {
 
+        ModelAndView model = new ModelAndView("views/postError");
+        model.addObject("errCode", ex.getErrCode());
+        model.addObject("errMsg", ex.getErrMsg());
+
+        return model;
+
+    }
+
+    /**
+     * Metodo para crear post
+     * @return
+     */
     private ArrayList<Post> createPosts(){
+        logger.info("inicio createPosts");
         // post 1
         Post post1 = new Post();
         post1.setTitle("My Blog Post 1");
@@ -62,6 +104,10 @@ public class PostController {
         return posts;
     }
 
+    /**
+     * Metodo para rellenar el cuerpo de un post
+     * @return
+     */
     private String getPostBody(){
         String body = "<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. In ac finibus mi. Morbi porttitor urna dui, sed volutpat justo rutrum sit amet. Etiam elementum lacus eget malesuada egestas. Sed id lectus arcu. Pellentesque molestie dignissim diam non commodo. Nunc nec aliquet lectus. Ut a accumsan sapien. Pellentesque sit amet sem nisl. Nulla fringilla vulputate mauris, eleifend dapibus libero. Sed eu cursus orci. In hac habitasse platea dictumst. Vestibulum vel vulputate ex. Nam gravida blandit nisl, at luctus mi interdum ut. Pellentesque et pharetra mi. Proin id placerat diam. Ut porttitor risus in leo tincidunt, a iaculis velit maximus.</p>";
         body += "<p>Nunc bibendum sollicitudin ex, vitae lobortis nunc malesuada eget. Maecenas aliquam aliquam elit, nec rutrum justo blandit sit amet. Cras pellentesque egestas nisi at egestas. Donec lacus ipsum, dignissim a accumsan quis, rutrum ac massa. Vivamus sed dolor nisl. Integer convallis, elit sed euismod molestie, purus velit ornare justo, ac maximus diam odio id felis. Maecenas auctor sed quam ac aliquet. Curabitur tempus sed purus sit amet blandit.</p>";

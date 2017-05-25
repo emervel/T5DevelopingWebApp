@@ -11,9 +11,9 @@ import org.springframework.http.HttpStatus;
 public class ThymeleafApplication {
 
     /*
-    * Con este bean estoy haciendo que el error 404 sea redirigido a la vista 404, en vez de ser tratado por el
-    * CustomErrorController. Sinceramente, prefiero usar el customerrorcontroller para gestionarlos todos y redigir en vez
-    * de usar este bean pero para el 404 no esta mal
+    * Con este bean estoy haciendo que el error 404 de pagina no encontrada sea redirigido al mapping 404 del CustomErrorController.
+    * Sinceramente, prefiero usar el CustomErrorController para gestionarlos todos y redigir en vez de poner todas las posibilidades aqui
+    * pero para el 404 no esta mal
     * */
     @Bean
     public EmbeddedServletContainerCustomizer containerCustomizer(){
